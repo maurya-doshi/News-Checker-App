@@ -1,0 +1,16 @@
+# Python / Virtual Environment
+__pycache__/
+*.pyc
+backend/venv/
+
+# Node.js / Frontend
+frontend/node_modules/
+frontend/dist/
+npm-debug.log
+yarn-error.log
+
+# Secrets - DO NOT commit secret keys! 🔒
+backend/.env
+
+# IDE - PyCharm
+.idea/
