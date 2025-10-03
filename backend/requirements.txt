@@ -5,6 +5,7 @@ fastapi
 fastapi[standard]
 re
 requests
+time
 uvicorn[standard]
 sqlalchemy
 psycopg2-binary
