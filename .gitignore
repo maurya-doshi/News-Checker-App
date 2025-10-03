@@ -14,3 +14,7 @@ backend/.env
 
 # IDE - PyCharm
 .idea/
+
+
+# Todo file
+.todo.txt
