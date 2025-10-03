@@ -78,13 +78,19 @@ class URL:
         if not link:
             raise ValueError("Empty string. No link found!")
 
-        if link_elements := re.search(r'^https?://(?:www\.)?(\w+)\.(?:it|com)/\w+/?(/\w+/?){0,3}$', link):
-            if link_elements.group(1) not in URL.supported_sites.keys():
+        if link_elements := re.search(r'^https?://(?:www\.)?(?:(redd)\.it/\w+|(reddit)\.com/r/(?:\w+/?){3}$|(x)\.com/(?:\w+/status/\w+|i/web/status/\w+))/?$', link):
+
+            for element in link_elements.groups():
+                # Get the site name, avoiding None. Eg: (None, None, x).
+                if element and element in URL.supported_sites.keys():
+                    self.site = URL.supported_sites[element]
+                    # Set link name to the link input.
+                    self._link = link
+
+            # If no valid site name found, raise a ValueError.
+            if not self.site:
                 raise ValueError("Invalid Site. Currently supported sites: Reddit, X")
 
-            self._link = link
-
-            self.site = URL.supported_sites[link_elements.group(1)]
 
         else:
             print("Invalid Link Format!")
@@ -142,6 +148,9 @@ class URL:
         print(f"Truth Value: {self._is_true}")
         print(f"Probability of being true: {self._truth_percentage}")
         print(f"Time spent on analysis: {time.time() - self.s_time:.4f} s")
+
+        # TODO: Add sources.
+
         print()
 
 
