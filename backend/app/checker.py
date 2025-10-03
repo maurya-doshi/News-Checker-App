@@ -31,13 +31,25 @@ import time
 '''
 
 class URL:
-    s_time = time.time()
-    check_time = datetime.now()
+    supported_sites = {
+                        "redd": "Reddit",
+                        "reddit": "Reddit",
+                        "x": "X"
+                      }
+
+    supported_formats = {
+                   "http(s)://redd.it/{post_id}",
+                   "https(s)://www.reddit.com/r/{subreddit}/{post_id}/{post_title}/",
+                   "http(s)://x.com/{username}/status/{post_id}",
+                   "http(s)://x.com/i/web/status/{post_id}"
+               }
 
     def __init__(self, link):
         self.link = link
         self.is_true = False
         self.truth_percentage = 0.0
+        self.check_time = datetime.now()
+        self.s_time = time.time()
 
     @property
     def link(self):
@@ -46,6 +58,12 @@ class URL:
     @link.setter
     def link(self, link):
         '''
+            Supported link formats:
+                1. http(s)://redd.it/{post_id}
+                2. https(s)://www.reddit.com/r/{subreddit}/{post_id}/{post_title}/
+                3. http(s)://x.com/{username}/status/{post_id}
+                4. http(s)://x.com/i/web/status/{post_id}
+
             Link validation
             1. Ensure that a non-empty string is read as the input.
             2. Ensure that the link comes from either Reddit or X.
@@ -60,9 +78,17 @@ class URL:
         if not link:
             raise ValueError("Empty string. No link found!")
 
-        # TODO - Implement a regular expression that validates user input.
+        if link_elements := re.search(r'^https?://(?:www\.)?(\w+)\.(?:it|com)/\w+/?(/\w+/?){0,3}$', link):
+            if link_elements.group(1) not in URL.supported_sites.keys():
+                raise ValueError("Invalid Site. Currently supported sites: Reddit, X")
 
-        self._link = link
+            self._link = link
+
+            self.site = URL.supported_sites[link_elements.group(1)]
+
+        else:
+            print("Invalid Link Format!")
+            raise ValueError("Invalid Link Format!")
 
 
     @property
@@ -74,7 +100,6 @@ class URL:
         # Ensure it's harder to change the boolean value is_true to "True" by default.
         if is_true:
             raise ValueError("Default value is False!")
-
         self._is_true = is_true
 
     @property
@@ -92,12 +117,32 @@ class URL:
 
     # Print the status of check.
     def __str__(self):
-        return f"Check at: {self.check_time}\nThe claim at: {self._link}, is most likely {self._is_true}.\nProbability of truth: {self._truth_percentage}.\n\nTime spent on analysis: {time.time()-self.s_time} s"
+        return f"\nCheck at: {self.check_time}\nThe claim at '{self._link}' from {self.site}, is most likely {self._is_true}.\nProbability of truth: {self._truth_percentage}.\nTime spent on analysis: {time.time()-self.s_time:.4f} s"
 
 
+    # Use exception handling after reading the API.
     def news_json(self):
-        # TODO - send a get request using the requests module and print the output in JSON format.
-        ...
+        # A dummy request.
+        response = requests.get("https://itunes.apple.com/search?entity=song&limit=1&term=weezer")
+
+        # Ensure a valid response was received.
+        if response.status_code == 200:
+            response = response.json()
+            print(json.dumps(response, indent = 4))
+
+        else:
+              print("Error Status during API request:", reponse.status_code)
+
+    # A verbose verdict regarding the claim at the given link.
+    def verbose_verdict(self):
+        print("\n\n===========   Verdict   =============")
+        print(f"Check requested at: {self.check_time}")
+        print(f"Link: {self._link}")
+        print(f"Site Detected: {self.site}")
+        print(f"Truth Value: {self._is_true}")
+        print(f"Probability of being true: {self._truth_percentage}")
+        print(f"Time spent on analysis: {time.time() - self.s_time:.4f} s")
+        print()
 
 
 def main():
@@ -115,12 +160,28 @@ def main():
     args = parser.parse_args()
 
     # Create a news_engine object.
-    news_engine = URL(args.link)
+    try:
+        news_engine = URL(args.link)
 
-    # Read the contents of the link in JSON format.
-    news_engine.news_json()
+    except ValueError:
+        print("\nUsage:")
+        for format in URL.supported_formats:
+            print(f"python checker.py {format} [-s] [-v] [-V]")
+        return 1
 
-    return 0;
+    else:
+        # Read the contents of the link in JSON format.
+        news_engine.news_json()
+
+        # If a silent output requested, just give enough information.
+        if args.silent:
+            print(news_engine)
+
+        # Else, provide a verbose information.
+        else:
+            news_engine.verbose_verdict()
+
+        return 0;
 
 
 if __name__ == "__main__":
