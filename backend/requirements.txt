@@ -8,5 +8,6 @@ requests
 time
 uvicorn[standard]
 sqlalchemy
+sys
 psycopg2-binary
 python-dotenv
