@@ -1,0 +1,16 @@
+.
+├── backend
+│   ├── app
+│   │   ├── checker.py
+│   │   ├── main.py
+│   │   └── test
+│   │       └── test_checker.py
+│   └── requirements.txt
+├── frontend
+│   └── src
+├── LICENSE
+├── __project_tree__
+└── README.md
+
+6 directories, 7 files
+Fri Oct  3 16:18:06 IST 2025
