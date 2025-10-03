@@ -57,7 +57,7 @@ class URL:
 
     @link.setter
     def link(self, link):
-        '''
+        """
             Supported link formats:
                 1. http(s)://redd.it/{post_id}
                 2. https(s)://www.reddit.com/r/{subreddit}/{post_id}/{post_title}/
@@ -71,8 +71,8 @@ class URL:
             Exceptions:
                 1. ValueError:
                     a. Empty input as link input.
-                    b. If link from an other site other than Reddit or X.
-        '''
+                    b. If link from any other site other than Reddit or X.
+        """
 
         # Ensure a non-empty string is read as a link.
         if not link:
@@ -114,7 +114,7 @@ class URL:
 
     @truth_percentage.setter
     def truth_percentage(self, truth_percentage):
-        # Ensure truth_percentage lies between 0 to 100.
+        # Ensure truth_percentage lies between 0 and 100.
         if not (0 <= truth_percentage <= 100):
             raise ValueError("Truth percentage can only lie in-between 0 to 100(inclusive)!")
 
@@ -137,7 +137,7 @@ class URL:
             print(json.dumps(response, indent = 4))
 
         else:
-              print("Error Status during API request:", reponse.status_code)
+              print("Error Status during API request:", response.status_code)
 
     # A verbose verdict regarding the claim at the given link.
     def verbose_verdict(self):
@@ -174,8 +174,8 @@ def main():
 
     except ValueError:
         print("\nUsage:")
-        for format in URL.supported_formats:
-            print(f"python checker.py {format} [-s] [-v] [-V]")
+        for formats in URL.supported_formats:
+            print(f"python checker.py {formats} [-s] [-v] [-V]")
         return 1
 
     else:
@@ -186,11 +186,11 @@ def main():
         if args.silent:
             print(news_engine)
 
-        # Else, provide a verbose information.
+        # Else, provide verbose information.
         else:
             news_engine.verbose_verdict()
 
-        return 0;
+        return 0
 
 
 if __name__ == "__main__":
